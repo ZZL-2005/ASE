@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: docker.1ms.run/library/mongo:6.0
+    container_name: ase-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ase_mongo_pass_2026
+    networks:
+      - ase-network
+
+  rocketchat:
+    image: docker.1ms.run/rocketchat/rocket.chat:6.5.0
+    container_name: ase-rocketchat
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URL: mongodb://admin:ase_mongo_pass_2026@mongodb:27017/rocketchat?authSource=admin
+      MONGO_OPLOG_URL: mongodb://admin:ase_mongo_pass_2026@mongodb:27017/local?authSource=admin
+      ROOT_URL: http://localhost:3000
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - ase-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  ase-network:
+    driver: bridge

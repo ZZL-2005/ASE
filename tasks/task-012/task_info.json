@@ -1,0 +1,27 @@
+{
+  "task_id": "task-012",
+  "config": {
+    "name": "replay-task-008",
+    "user_mode": "interactive",
+    "llm_config": {},
+    "user_script": null,
+    "description": "",
+    "replay_config": {
+      "trajectory_path": "/new_disk4/jiayue_pu/ZZL/ASE/tasks/task-008/trajectories/agent/agent_20260402_092924.jsonl",
+      "steps": 6
+    }
+  },
+  "state": "stopped",
+  "created_at": "2026-04-02T18:24:57.805719",
+  "started_at": "2026-04-02T18:24:57.806125",
+  "stopped_at": "2026-04-02T18:44:23.297497",
+  "ports": {
+    "rocketchat": 11101,
+    "smtp": 11125,
+    "imap": 11143,
+    "web": 11180,
+    "smtp_submit": 11187,
+    "imaps": 11193
+  },
+  "error": null
+}

@@ -1,0 +1,133 @@
+services:
+  # MongoDB for Rocket.Chat
+  mongodb:
+    image: docker.1ms.run/library/mongo:5.0
+    container_name: ase-mongodb
+    restart: unless-stopped
+    command: mongod --replSet rs0 --oplogSize 128
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ase-network
+
+  # MongoDB init
+  mongodb-init:
+    image: docker.1ms.run/library/mongo:5.0
+    container_name: ase-mongodb-init
+    restart: on-failure
+    depends_on:
+      - mongodb
+    networks:
+      - ase-network
+    command: >
+      bash -c "
+        sleep 15;
+        mongosh mongodb://mongodb:27017 --eval \"
+        rs.initiate({
+          _id: 'rs0',
+          members: [{_id: 0, host: 'mongodb:27017'}]
+        })
+        \"
+      "
+
+  # Rocket.Chat Server
+  rocketchat:
+    image: docker.1ms.run/rocketchat/rocket.chat:5.3.0
+    container_name: ase-rocketchat
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URL: mongodb://mongodb:27017/rocketchat?replicaSet=rs0
+      ROOT_URL: http://localhost:3001
+      PORT: 3000
+      ADMIN_USERNAME: aseadmin
+      ADMIN_PASS: admin_pass_2026
+      ADMIN_EMAIL: admin@ase.local
+      ADMIN_NAME: ASE Admin
+      Show_Setup_Wizard: completed
+      OVERWRITE_SETTING_Show_Setup_Wizard: completed
+    ports:
+      - "3001:3000"
+    networks:
+      - ase-network
+
+  # Email Server
+  mailserver:
+    image: docker.1ms.run/mailserver/docker-mailserver:13.3.1
+    container_name: ase-mailserver
+    hostname: mail.ase.local
+    restart: unless-stopped
+    ports:
+      - "1025:25"
+      - "1587:587"
+      - "1143:143"
+      - "1993:993"
+    volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - ./services/email/config/:/tmp/docker-mailserver/
+    environment:
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_CLAMAV=0
+      - ENABLE_FAIL2BAN=0
+      - ENABLE_POSTGREY=0
+      - ENABLE_AMAVIS=0
+      - ONE_DIR=1
+      - DMS_DEBUG=0
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - ase-network
+
+  # Simple Web Environment (nginx)
+  webenv:
+    image: docker.1ms.run/library/nginx:alpine
+    container_name: ase-webenv
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./services/web/html:/usr/share/nginx/html:ro
+    networks:
+      - ase-network
+
+  # Agent Sandbox (full nanobot agent)
+  agent:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    container_name: ase-agent
+    restart: unless-stopped
+    depends_on:
+      - rocketchat
+      - mailserver
+    environment:
+      - LLM_API_BASE=${LLM_API_BASE:-https://api2.aigcbest.top/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-sk-NzLZFOtu8BlGDCGJtJMy7TpbNgCbk5vTGF9oz3Mml3IL2m0x}
+      - LLM_MODEL=${LLM_MODEL:-DeepSeek-V3}
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.7}
+      - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-8192}
+      - AGENT_WORKSPACE=/app/workspace
+      - RC_URL=http://rocketchat:3000
+      - RC_USERNAME=agent
+      - RC_PASSWORD=agent_pass_2026
+      - IMAP_HOST=mailserver
+      - SMTP_HOST=mailserver
+      - EMAIL_USER=agent@ase.local
+      - EMAIL_PASS=agent_pass_2026
+      - ASE_ALLOW_INTERNAL_NETWORK=1
+    networks:
+      - ase-network
+
+volumes:
+  mongodb_data:
+  maildata:
+  mailstate:
+  maillogs:
+
+networks:
+  ase-network:
+    driver: bridge
+

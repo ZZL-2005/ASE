@@ -1,0 +1,23 @@
+{
+  "task_id": "task-005",
+  "config": {
+    "name": "demo-v2",
+    "user_mode": "interactive",
+    "llm_config": {},
+    "user_script": null,
+    "description": ""
+  },
+  "state": "stopped",
+  "created_at": "2026-04-02T16:35:02.545479",
+  "started_at": "2026-04-02T16:35:02.545677",
+  "stopped_at": "2026-04-02T16:38:59.728238",
+  "ports": {
+    "rocketchat": 10401,
+    "smtp": 10425,
+    "imap": 10443,
+    "web": 10480,
+    "smtp_submit": 10487,
+    "imaps": 10493
+  },
+  "error": null
+}

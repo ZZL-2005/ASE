@@ -1,0 +1,23 @@
+{
+  "task_id": "task-002",
+  "config": {
+    "name": "e2e-test",
+    "user_mode": "interactive",
+    "llm_config": {},
+    "user_script": null,
+    "description": ""
+  },
+  "state": "stopped",
+  "created_at": "2026-04-02T15:54:46.221178",
+  "started_at": "2026-04-02T15:54:52.774982",
+  "stopped_at": "2026-04-02T16:16:34.807283",
+  "ports": {
+    "rocketchat": 10101,
+    "smtp": 10125,
+    "imap": 10143,
+    "web": 10180,
+    "smtp_submit": 10187,
+    "imaps": 10193
+  },
+  "error": null
+}

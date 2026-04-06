@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mailserver:
+    image: docker.1ms.run/mailserver/docker-mailserver:13.3.1
+    container_name: ase-mailserver
+    hostname: mail.ase.local
+    restart: unless-stopped
+    ports:
+      - "25:25"
+      - "587:587"
+      - "143:143"
+      - "993:993"
+    volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - ./config/:/tmp/docker-mailserver/
+    environment:
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_CLAMAV=0
+      - ENABLE_FAIL2BAN=0
+      - ENABLE_POSTGREY=0
+      - ONE_DIR=1
+      - DMS_DEBUG=0
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - ase-network
+
+volumes:
+  maildata:
+  mailstate:
+  maillogs:
+
+networks:
+  ase-network:
+    driver: bridge
