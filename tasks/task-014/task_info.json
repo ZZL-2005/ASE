@@ -1,0 +1,24 @@
+{
+  "task_id": "task-014",
+  "config": {
+    "name": "my-experiment",
+    "user_mode": "interactive",
+    "llm_config": {},
+    "user_script": null,
+    "description": "",
+    "replay_config": null
+  },
+  "state": "stopped",
+  "created_at": "2026-04-07T01:06:39.469598",
+  "started_at": "2026-04-07T01:07:35.829011",
+  "stopped_at": "2026-04-07T02:22:41.108763",
+  "ports": {
+    "rocketchat": 11301,
+    "smtp": 11325,
+    "imap": 11343,
+    "web": 11380,
+    "smtp_submit": 11387,
+    "imaps": 11393
+  },
+  "error": null
+}

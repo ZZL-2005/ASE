@@ -5,12 +5,13 @@
     "user_mode": "interactive",
     "llm_config": {},
     "user_script": null,
-    "description": ""
+    "description": "",
+    "replay_config": null
   },
   "state": "stopped",
   "created_at": "2026-04-02T15:03:45.788486",
   "started_at": null,
-  "stopped_at": "2026-04-02T15:54:40.754711",
+  "stopped_at": "2026-04-07T19:18:51.878505",
   "ports": {
     "rocketchat": 10001,
     "smtp": 10025,

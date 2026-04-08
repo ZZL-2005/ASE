@@ -3,7 +3,7 @@
 Each Task gets its own compose file with isolated container names, network,
 ports, and volume mounts for trajectory collection.
 """
-
+# ASE/orchestrator/compose_gen.py
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -40,6 +40,7 @@ def generate_compose(
 
     llm = llm_config or {}
     api_base = llm.get("api_base", "https://api2.aigcbest.top/v1")
+
     api_key = llm.get("api_key", "sk-NzLZFOtu8BlGDCGJtJMy7TpbNgCbk5vTGF9oz3Mml3IL2m0x")
     model = llm.get("model", "DeepSeek-V3")
     temperature = llm.get("temperature", "0.7")
@@ -184,6 +185,7 @@ def generate_compose(
         "depends_on": ["rocketchat", "mailserver"],
         "environment": agent_env,
         "volumes": agent_volumes,
+        "extra_hosts": ["host.docker.internal:host-gateway"],
         "networks": [network],
     }
 

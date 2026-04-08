@@ -1,0 +1,111 @@
+services:
+  mongodb:
+    image: docker.1ms.run/library/mongo:5.0
+    container_name: ase-task-015-mongodb
+    restart: unless-stopped
+    command: mongod --replSet rs0 --oplogSize 128
+    volumes:
+    - ase-task-015_mongodb_data:/data/db
+    networks:
+    - ase-task-015-net
+  mongodb-init:
+    image: docker.1ms.run/library/mongo:5.0
+    container_name: ase-task-015-mongodb-init
+    restart: on-failure
+    depends_on:
+    - mongodb
+    networks:
+    - ase-task-015-net
+    command: 'bash -c "sleep 15; mongosh mongodb://mongodb:27017 --eval \"rs.initiate({_id:
+      ''rs0'', members: [{_id: 0, host: ''mongodb:27017''}]})\""'
+  rocketchat:
+    image: docker.1ms.run/rocketchat/rocket.chat:5.3.0
+    container_name: ase-task-015-rocketchat
+    restart: unless-stopped
+    depends_on:
+    - mongodb
+    environment:
+      MONGO_URL: mongodb://mongodb:27017/rocketchat?replicaSet=rs0
+      ROOT_URL: http://localhost:11401
+      PORT: '3000'
+      ADMIN_USERNAME: aseadmin
+      ADMIN_PASS: admin_pass_2026
+      ADMIN_EMAIL: admin@ase.local
+      ADMIN_NAME: ASE Admin
+      Show_Setup_Wizard: completed
+      OVERWRITE_SETTING_Show_Setup_Wizard: completed
+    ports:
+    - 11401:3000
+    networks:
+    - ase-task-015-net
+  mailserver:
+    image: docker.1ms.run/mailserver/docker-mailserver:13.3.1
+    container_name: ase-task-015-mailserver
+    hostname: mail.ase.local
+    restart: unless-stopped
+    ports:
+    - '11425:25'
+    - 11487:587
+    - 11443:143
+    - 11493:993
+    volumes:
+    - ase-task-015_maildata:/var/mail
+    - ase-task-015_mailstate:/var/mail-state
+    - ase-task-015_maillogs:/var/log/mail
+    - /new_disk4/jiayue_pu/ZZL/ASE/services/email/config:/tmp/docker-mailserver/
+    environment:
+    - ENABLE_SPAMASSASSIN=0
+    - ENABLE_CLAMAV=0
+    - ENABLE_FAIL2BAN=0
+    - ENABLE_POSTGREY=0
+    - ENABLE_AMAVIS=0
+    - ONE_DIR=1
+    - DMS_DEBUG=0
+    cap_add:
+    - NET_ADMIN
+    networks:
+    - ase-task-015-net
+  webenv:
+    image: docker.1ms.run/library/nginx:alpine
+    container_name: ase-task-015-webenv
+    restart: unless-stopped
+    ports:
+    - 11480:80
+    volumes:
+    - /new_disk4/jiayue_pu/ZZL/ASE/services/web/html:/usr/share/nginx/html:ro
+    networks:
+    - ase-task-015-net
+  agent:
+    image: ase-agent
+    container_name: ase-task-015-agent
+    restart: unless-stopped
+    depends_on:
+    - rocketchat
+    - mailserver
+    environment:
+    - LLM_API_BASE=http://127.0.0.1:8000/v1
+    - LLM_API_KEY=sk-NzLZFOtu8BlGDCGJtJMy7TpbNgCbk5vTGF9oz3Mml3IL2m0x
+    - LLM_MODEL=Qwen/Qwen3.5-4B
+    - LLM_TEMPERATURE=0.7
+    - LLM_MAX_TOKENS=8192
+    - AGENT_WORKSPACE=/app/workspace
+    - RC_URL=http://rocketchat:3000
+    - RC_USERNAME=agent
+    - RC_PASSWORD=agent_pass_2026
+    - IMAP_HOST=mailserver
+    - SMTP_HOST=mailserver
+    - EMAIL_USER=agent@ase.local
+    - EMAIL_PASS=agent_pass_2026
+    - ASE_ALLOW_INTERNAL_NETWORK=1
+    volumes:
+    - /new_disk4/jiayue_pu/ZZL/ASE/tasks/task-015/trajectories/agent:/app/trajectories
+    networks:
+    - ase-task-015-net
+volumes:
+  ase-task-015_mongodb_data: null
+  ase-task-015_maildata: null
+  ase-task-015_mailstate: null
+  ase-task-015_maillogs: null
+networks:
+  ase-task-015-net:
+    driver: bridge

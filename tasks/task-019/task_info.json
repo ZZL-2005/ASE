@@ -1,0 +1,27 @@
+{
+  "task_id": "task-019",
+  "config": {
+    "name": "vllm-exp-001",
+    "user_mode": "interactive",
+    "llm_config": {
+      "model": "Qwen/Qwen3.5-27B",
+      "api_base": "http://183.174.228.138:8000/v1"
+    },
+    "user_script": null,
+    "description": "",
+    "replay_config": null
+  },
+  "state": "stopped",
+  "created_at": "2026-04-08T01:16:27.890299",
+  "started_at": "2026-04-08T01:16:34.135672",
+  "stopped_at": "2026-04-08T02:40:28.635318",
+  "ports": {
+    "rocketchat": 11801,
+    "smtp": 11825,
+    "imap": 11843,
+    "web": 11880,
+    "smtp_submit": 11887,
+    "imaps": 11893
+  },
+  "error": null
+}

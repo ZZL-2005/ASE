@@ -49,7 +49,7 @@ ASE/
 - pip 依赖：
 
 ```bash
-pip install pyyaml loguru httpx
+uv pip install pyyaml loguru httpx
 ```
 
 ## 快速开始
@@ -62,6 +62,13 @@ pip install pyyaml loguru httpx
 python scripts/ase_task.py create --name "my-experiment" --mode interactive
 ```
 
+```bash
+python scripts/ase_task.py create \
+  --name "vllm-exp-001" \
+  --mode interactive \
+  --api-base "http://183.174.228.138:8000/v1" \
+  --model "Qwen/Qwen3.5-27B"
+```
 输出：
 ```
 Created: task-001
@@ -75,7 +82,7 @@ To start: python scripts/ase_task.py start task-001
 - `interactive` — 人类通过 Rocket.Chat Web UI 与 agent 交互
 - `simulated` — LLM 模拟用户自动发送消息
 
-### 2. 启动 Task
+### 2. 启动 Task (目前启动居然要花费6-7min，是比较久的感觉。)
 
 ```bash
 python scripts/ase_task.py start task-001
