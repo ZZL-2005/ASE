@@ -63,6 +63,7 @@ python scripts/ase_task.py create --name "my-experiment" --mode interactive
 ```
 
 ```bash
+source .venv/bin/activate
 python scripts/ase_task.py create \
   --name "vllm-exp-001" \
   --mode interactive \
